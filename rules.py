@@ -83,15 +83,10 @@ class RuleEngine:
             if status is not None:
                 if status == RuleStatus.FAILED:
                     self.status = RuleStatus.FAILED
-                    self.logs.append(RuleLog(Rule(0, 0, "RulesEngineProcess.Compile.Failed", 0, False, lambda _,__,___: True,
-                                                  lambda _,__,___: True), input, output, "failed"))
                     print(f"FAILED {rule}")
                     break
                 elif status == RuleStatus.SUCCESS:
                     self.status = RuleStatus.SUCCESS
-                    self.logs.append(RuleLog(
-                        Rule(0, 0, "RulesEngineProcess.Compile.Success", 0, False, lambda _, __, ___: True,
-                             lambda _, __, ___: False), input, output, "success"))
                     print(f"SUCCESS {rule}")
                     break
         return status
