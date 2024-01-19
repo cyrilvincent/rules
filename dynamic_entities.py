@@ -18,6 +18,10 @@ class Attribute(Parameter):
     value: Any
 
 @dataclass
+class AttributeList(Parameter):
+    value: List[Any]
+
+@dataclass
 class Method(BaseEntity):
     type: Class
     parameters: List[Parameter]
@@ -26,17 +30,15 @@ class Method(BaseEntity):
 
 @dataclass
 class Class(BaseEntity):
-    attributes: List[Attribute] = field(default_factory=list)
+    attributes: List[Attribute | AttributeList] = field(default_factory=list)
     methods: List[Method] = field(default_factory=list)
     python_type: Any = object
 
 class Instance(Class):
 
-    def __init__(self, name: str, attributes: List[Attribute], class_: Class):
+    def __init__(self, name: str, attributes: List[Attribute | AttributeList], class_: Class):
         super().__init__(name, attributes, [])
         self.class_ = class_
-
-
 
 class Entity:
 
@@ -78,6 +80,15 @@ if __name__ == '__main__':
     print(input.value)
     output = instance(class_factory(output_class), output_instance)
     print(output.nb_try)
+    x_class = Class("x", [Attribute("input", input_class, None), AttributeList("output", output_class, [])], [])
+    x_instance = Instance("x1", [Attribute("input", input_class, input), AttributeList("output", output_class, [output, output])], x_class)
+    c = class_factory(x_class)
+    print(c)
+    x = instance(c, x_instance)
+    print(x)
+    print(x.input.value)
+    print(x.output)
+    print(x.output[0].value)
 
 
 
