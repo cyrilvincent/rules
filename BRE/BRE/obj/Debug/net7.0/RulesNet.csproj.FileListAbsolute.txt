@@ -1,0 +1,12 @@
+C:\Users\conta\git-CVC\Rules\git-rules\rule_net\ConsoleApp1\RulesNet\obj\Debug\net7.0\RulesNet.csproj.AssemblyReference.cache
+C:\Users\conta\git-CVC\Rules\git-rules\rule_net\ConsoleApp1\RulesNet\obj\Debug\net7.0\RulesNet.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\conta\git-CVC\Rules\git-rules\rule_net\ConsoleApp1\RulesNet\obj\Debug\net7.0\RulesNet.AssemblyInfoInputs.cache
+C:\Users\conta\git-CVC\Rules\git-rules\rule_net\ConsoleApp1\RulesNet\obj\Debug\net7.0\RulesNet.AssemblyInfo.cs
+C:\Users\conta\git-CVC\Rules\git-rules\rule_net\ConsoleApp1\RulesNet\obj\Debug\net7.0\RulesNet.csproj.CoreCompileInputs.cache
+C:\Users\conta\git-CVC\Rules\git-rules\rule_net\ConsoleApp1\RulesNet\bin\Debug\net7.0\RulesNet.deps.json
+C:\Users\conta\git-CVC\Rules\git-rules\rule_net\ConsoleApp1\RulesNet\bin\Debug\net7.0\RulesNet.dll
+C:\Users\conta\git-CVC\Rules\git-rules\rule_net\ConsoleApp1\RulesNet\bin\Debug\net7.0\RulesNet.pdb
+C:\Users\conta\git-CVC\Rules\git-rules\rule_net\ConsoleApp1\RulesNet\obj\Debug\net7.0\RulesNet.dll
+C:\Users\conta\git-CVC\Rules\git-rules\rule_net\ConsoleApp1\RulesNet\obj\Debug\net7.0\refint\RulesNet.dll
+C:\Users\conta\git-CVC\Rules\git-rules\rule_net\ConsoleApp1\RulesNet\obj\Debug\net7.0\RulesNet.pdb
+C:\Users\conta\git-CVC\Rules\git-rules\rule_net\ConsoleApp1\RulesNet\obj\Debug\net7.0\ref\RulesNet.dll

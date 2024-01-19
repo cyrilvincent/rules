@@ -1,0 +1,146 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\conta\\git-CVC\\Rules\\git-rules\\BRE\\BRE.Tests.Samples\\BRE.Tests.Samples.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\conta\\git-CVC\\Rules\\git-rules\\BRE\\BRE.Tests.Samples\\BRE.Tests.Samples.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\conta\\git-CVC\\Rules\\git-rules\\BRE\\BRE.Tests.Samples\\BRE.Tests.Samples.csproj",
+        "projectName": "BRE.Tests.Samples",
+        "projectPath": "C:\\Users\\conta\\git-CVC\\Rules\\git-rules\\BRE\\BRE.Tests.Samples\\BRE.Tests.Samples.csproj",
+        "packagesPath": "C:\\Users\\conta\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\conta\\git-CVC\\Rules\\git-rules\\BRE\\BRE.Tests.Samples\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\conta\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "C:\\Users\\conta\\git-CVC\\Rules\\git-rules\\BRE\\BRE\\BRE.csproj": {
+                "projectPath": "C:\\Users\\conta\\git-CVC\\Rules\\git-rules\\BRE\\BRE\\BRE.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "dependencies": {
+            "MSTest.TestAdapter": {
+              "target": "Package",
+              "version": "[2.2.10, )"
+            },
+            "MSTest.TestFramework": {
+              "target": "Package",
+              "version": "[2.2.10, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[17.3.2, )"
+            },
+            "coverlet.collector": {
+              "target": "Package",
+              "version": "[3.1.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.115\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\conta\\git-CVC\\Rules\\git-rules\\BRE\\BRE\\BRE.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\conta\\git-CVC\\Rules\\git-rules\\BRE\\BRE\\BRE.csproj",
+        "projectName": "BRE",
+        "projectPath": "C:\\Users\\conta\\git-CVC\\Rules\\git-rules\\BRE\\BRE\\BRE.csproj",
+        "packagesPath": "C:\\Users\\conta\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\conta\\git-CVC\\Rules\\git-rules\\BRE\\BRE\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\conta\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "dependencies": {
+            "Z.Expressions.Eval": {
+              "target": "Package",
+              "version": "[6.0.6, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.115\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
