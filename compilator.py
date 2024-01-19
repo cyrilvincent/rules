@@ -13,7 +13,7 @@ class Compilator:
     def __init__(self, variables: Variables):
         self.variables = variables
         self.python_fns: Dict[str, str] = {}
-        self.parameters = [Parameter("i"), Parameter("o"), Parameter("v")]
+        self.parameters = ["i", "o", "v"]
 
     def compile(self, rules: List[RuleTO]):
         for r in rules:

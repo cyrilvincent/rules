@@ -17,13 +17,13 @@ class Operand:
         return str(self.value)
 
 
-class StringValue(Operand):
+class StringOperand:
 
     def __init__(self, value: str):
-        super().__init__(value)
+        self.value = value
 
     def python(self) -> str:
-        return f'"{self.value}"'
+        return f'f"{self.value}"'
 
 
 class DateTimeValue(Operand):
@@ -202,9 +202,10 @@ class RangeOperator(TernaryOperator):
         return f"range({self.operand1.python()}, {self.operand2.python()}, {self.operand3.python()})"
 
 
-class Bloc:
+class Bloc(Operand):
 
     def __init__(self, operands: List[Operand]=[]):
+        super().__init__(None)
         self.operands = operands
 
     def python(self):
@@ -251,7 +252,6 @@ class ElseInstruction(KeywordInstruction):
         super().__init__("else", Operand(True), bloc)
 
 
-
 class WhileInstruction(KeywordInstruction):
 
     def __init__(self, condition: Operand, bloc: Bloc):
@@ -268,43 +268,35 @@ class ForInstruction(KeywordBinaryInstruction):
         return remove_empty_lines(s)
 
 
-class Parameter:
+class Def(KeywordInstruction):
 
-    def __init__(self, name: str):
-        self.name = name
-
-
-class Def:
-
-    def __init__(self, name: str, parameters: List[Parameter], bloc: Bloc):
-        self.name = name
+    def __init__(self, name: str, parameters: List[str], bloc: Bloc):
+        super().__init__(name, Operand(None), bloc)
         self.parameters = parameters
-        self.bloc = bloc
 
     def python(self) -> str:
         s = f"def {self.name}("
-        s += ", ".join([p.name for p in self.parameters])
+        s += ", ".join(self.parameters)
         s += "):\n"
         for o in self.bloc.operands:
             s += f"\t{o.python().replace("\n\t", "\n\t\t")}\n"
         return remove_empty_lines(s)
 
 
-class Lambda(Operand):
+class Lambda(KeywordInstruction):
 
-    def __init__(self, parameters: List[Parameter], operand: Operand):
-        super().__init__(None)
+    def __init__(self, parameters: List[str], operand: Operand):
+        super().__init__("lambda", operand, Bloc())
         self.parameters = parameters
-        self.operand = operand
 
     def python(self) -> str:
         s = "lambda "
-        s += ", ".join([p.name for p in self.parameters])
+        s += ", ".join(self.parameters)
         s += f": {self.operand.python()}"
         return s
 
 
-class FunctionCall(ManyOperator):
+class Call(ManyOperator):
 
     def python(self) -> str:
         s = f"{self.name}("
@@ -314,12 +306,6 @@ class FunctionCall(ManyOperator):
         return s
 
 
-class Entity:
-
-    def __init__(self):
-        super().__init__()
-
-
 if __name__ == '__main__':
     left = Operand("i.value")
     right = Operand("o.value")
@@ -327,10 +313,7 @@ if __name__ == '__main__':
     print(jsonpickle.dumps(Bloc([op_equal]), make_refs=False))
     print(op_equal)
     print(op_equal.python())
-    i_param = Parameter("i")
-    o_param = Parameter("o")
-    v_param = Parameter("v")
-    params = [i_param, o_param, v_param]
+    params = ["i", "o", "v"]
     instruction = Operand("RuleStatus.SUCCESS")
     print(jsonpickle.dumps(Bloc([instruction]), make_refs=False))
     lambda_cond = Lambda(params, instruction)
@@ -351,7 +334,7 @@ if __name__ == '__main__':
             Bloc([if_inst,
                   ElIfInstruction(op_equal, Bloc([AffectationOperator(next, AddOperator(next, Operand(1)))])),
                   ElseInstruction(Bloc([AffectationOperator(next, MulOperator(next, Operand(2)))])),
-                  AffectationOperator(next, SubOperator(next, FunctionCall("math.sin", [Operand(0)])))]))
+                  AffectationOperator(next, SubOperator(next, Call("math.sin", [Operand(0)])))]))
     for_inst = ForInstruction(Operand("i"), RangeOperator(Operand(0), Operand(10), Operand(1)), Bloc([while_inst]))
     bloc = Bloc()
     bloc.operands.append(affect1)

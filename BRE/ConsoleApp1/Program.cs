@@ -49,7 +49,7 @@ code = code.Replace("{code1}", code1);
 Console.WriteLine(code);
 
 var rule = new Rule<GameEntity, GameOutput> { Name = "test" };
-//var script = CSharpScript.EvaluateAsync(code);
+var script = CSharpScript.EvaluateAsync(code);
 
 
 
