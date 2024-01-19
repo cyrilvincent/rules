@@ -49,7 +49,7 @@ class UnaryOperator(Operator):
         self.operand = operand
 
     def python(self) -> str:
-        o = {self.operand.python()}
+        o = self.operand.python()
         if " " in o:
             o = f"({o})"
         return f"{self.name} {o}"
@@ -140,11 +140,6 @@ class GEOperator(BinaryOperator):
         super().__init__(name=">=", left=left, right=right)
 
 
-class PlusOperator(BinaryOperator):
-
-    def __init__(self, right: Operand, left: Operand):
-        super().__init__("+", right, left)
-
 class AddOperator(BinaryOperator):
 
     def __init__(self, right: Operand, left: Operand):
@@ -212,12 +207,23 @@ class Bloc:
     def __init__(self, operands: List[Operand]=[]):
         self.operands = operands
 
+    def python(self):
+        s = ""
+        for o in self.operands:
+            s += f"\t{o.python().replace("\n\t", "\n\t\t")}\n"
+        return s
+
 
 class KeywordInstruction(UnaryOperator):
 
     def __init__(self, name: str, operand: Operand, bloc: Bloc):
         super().__init__(name, operand)
         self.bloc = bloc
+
+    def python(self):
+        s = f"{self.name} {self.operand.python()}:\n"
+        s += self.bloc.python()
+        return remove_empty_lines(s)
 
 
 class KeywordBinaryInstruction(BinaryOperator):
@@ -232,32 +238,24 @@ class IfInstruction(KeywordInstruction):
     def __init__(self, condition: Operand, bloc: Bloc):
         super().__init__("if", condition, bloc)
 
-    def python(self):
-        s = f"{self.name} {self.operand.python()}:\n"
-        for o in self.bloc.operands:
-            s += f"\t{o.python().replace("\n\t", "\n\t\t")}\n"
-        return remove_empty_lines(s)
 
-
-class ElIfInstruction(IfInstruction):
+class ElIfInstruction(KeywordInstruction):
 
     def __init__(self, condition: Operand, bloc: Bloc):
-        super().__init__(condition, bloc)
-        self.name = "elif"
+        super().__init__("elif", condition, bloc)
 
 
-class ElseInstruction(ElIfInstruction):
+class ElseInstruction(KeywordInstruction):
 
     def __init__(self, bloc: Bloc):
-        super().__init__(Operand(True), bloc)
+        super().__init__("else", Operand(True), bloc)
 
 
 
-class WhileInstruction(IfInstruction):
+class WhileInstruction(KeywordInstruction):
 
     def __init__(self, condition: Operand, bloc: Bloc):
-        super().__init__(condition, bloc)
-        self.name = "while"
+        super().__init__("while", condition, bloc)
 
 class ForInstruction(KeywordBinaryInstruction):
 
@@ -266,8 +264,7 @@ class ForInstruction(KeywordBinaryInstruction):
 
     def python(self):
         s = f"for {self.left.python()} in {self.right.python()}:\n"
-        for o in self.bloc.operands:
-            s += f"\t{o.python().replace("\n\t", "\n\t\t")}\n"
+        s += self.bloc.python()
         return remove_empty_lines(s)
 
 
@@ -341,7 +338,7 @@ if __name__ == '__main__':
     print(lambda_cond.python())
     op_less = LTOperator(left, right)
     print(op_less.python())
-    plus = PlusOperator(right, Operand("i.max"))
+    plus = AddOperator(right, Operand("i.max"))
     div2 = TrueDivOperator(plus, Operand(2))
     next = Operand("next")
     affect1 = AffectationOperator(next, div2)
@@ -361,7 +358,7 @@ if __name__ == '__main__':
     bloc.operands.append(for_inst)
     bloc.operands.append(AffectationOperator(Operand("i.min"), right))
     bloc.operands.append(AffectationOperator(right, next))
-    bloc.operands.append(AffectationOperator(Operand("o.nb_try"), PlusOperator(Operand("o.nb_try"), Operand("1"))))
+    bloc.operands.append(AffectationOperator(Operand("o.nb_try"), AddOperator(Operand("o.nb_try"), Operand("1"))))
     bloc.operands.append(ReturnOperator(Operand(True)))
     fn = Def("action_less", params, bloc)
     print(jsonpickle.dumps(fn, make_refs=False))
