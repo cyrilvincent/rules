@@ -61,7 +61,7 @@ class RuleStatus(Enum):
 
 class RuleEngine:
 
-    def __init__(self, ruleset: RuleSet, variables: Variables):
+    def __init__(self, ruleset: RuleSet, variables: Variables): # TODO mettre les variables dans ruleset
         self.ruleset = ruleset
         self.variables = variables
         self.logs: List[RuleLog] = []

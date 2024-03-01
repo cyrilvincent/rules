@@ -4,15 +4,17 @@ from dynamic_entities import Entity
 from rules import Variables, Variable
 import jsonpickle
 
-def remove_empty_lines(s: str) -> str:
-    if "\n\n" in s:
-        return remove_empty_lines(s.replace("\n\n", "\n"))
-    return s
+
 
 class Token:
 
     def __init__(self):
         pass
+
+    def remove_empty_lines(self, s: str) -> str:
+        if "\n\n" in s:
+            return self.remove_empty_lines(s.replace("\n\n", "\n"))
+        return s
 
 class Operand(Token):
 
@@ -24,13 +26,14 @@ class Operand(Token):
         return str(self.value)
 
 
+
 class StringOperand:
 
     def __init__(self, value: str):
         self.value = value
 
     def python(self) -> str:
-        return f'f"{self.value}"'
+        return f'"{self.value}"'
 
 
 class DateTimeOperand(Operand):
@@ -240,7 +243,7 @@ class UnaryInstruction(Instruction):
     def python(self):
         s = f"{self.name} {self.operand.python()}:\n"
         s += self.bloc.python()
-        return remove_empty_lines(s)
+        return self.remove_empty_lines(s)
 
 
 class BinaryInstruction(Instruction):
@@ -282,7 +285,7 @@ class ForInstruction(BinaryInstruction):
     def python(self):
         s = f"for {self.left.python()} in {self.right.python()}:\n"
         s += self.bloc.python()
-        return remove_empty_lines(s)
+        return self.remove_empty_lines(s)
 
 
 class FunctionInstruction(UnaryInstruction):
@@ -296,7 +299,7 @@ class FunctionInstruction(UnaryInstruction):
         s += ", ".join(self.parameters)
         s += "):\n"
         s += self.bloc.python()
-        return remove_empty_lines(s)
+        return self.remove_empty_lines(s)
 
 
 class LambdaInstruction(UnaryInstruction):
@@ -331,7 +334,7 @@ class MethodInstruction(FunctionInstruction):
         s += ", ".join(self.parameters)
         s += "):\n"
         s += self.bloc.python()
-        return remove_empty_lines(s)
+        return self.remove_empty_lines(s)
 
 class ClassInstruction(Instruction):
 
@@ -358,8 +361,8 @@ class ClassInstruction(Instruction):
         return s
 class InstanciationInstruction(Call):
 
-    def __init__(self, name: str, values: List[Operand]):
-        super().__init__(name, values)
+    def __init__(self, class_: str, values: List[Operand]):
+        super().__init__(class_, values)
 
 if __name__ == '__main__':
     left = Operand("i.value")

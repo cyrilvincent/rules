@@ -48,8 +48,8 @@ class Entity:
 def class_factory(c: Class):
     return type(c.name, (Entity,), {} )
 
-def instance(real_class: Any, i: Instance):
-    instance: Entity = real_class()
+def instance(class_: Any, i: Instance):
+    instance: Entity = class_()
     dict = {}
     for a in i.attributes:
         dict[a.name] = a.value
