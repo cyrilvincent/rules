@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Any, List
+from typing import Any, List, Dict
+from dynamic_entities import Entity
 from rules import Variables, Variable
 import jsonpickle
 
@@ -8,9 +9,15 @@ def remove_empty_lines(s: str) -> str:
         return remove_empty_lines(s.replace("\n\n", "\n"))
     return s
 
-class Operand:
+class Token:
+
+    def __init__(self):
+        pass
+
+class Operand(Token):
 
     def __init__(self, value: Any):
+        super().__init__()
         self.value = value
 
     def python(self) -> str:
@@ -26,7 +33,7 @@ class StringOperand:
         return f'f"{self.value}"'
 
 
-class DateTimeValue(Operand):
+class DateTimeOperand(Operand):
 
     def __init__(self, value: str):
         super().__init__(value)
@@ -202,24 +209,33 @@ class RangeOperator(TernaryOperator):
         return f"range({self.operand1.python()}, {self.operand2.python()}, {self.operand3.python()})"
 
 
-class Bloc(Operand):
+class Bloc(Token):
 
-    def __init__(self, operands: List[Operand]=[]):
-        super().__init__(None)
+    def __init__(self, operands: List[Operand]=[], indent=2):
+        super().__init__()
         self.operands = operands
+        self.indent = indent
 
     def python(self):
         s = ""
         for o in self.operands:
-            s += f"\t{o.python().replace("\n\t", "\n\t\t")}\n"
+            for _ in range(self.indent):
+                s += "\t"
+            s += f"{o.python()}\n"
         return s
 
+class Instruction(Operand):
 
-class KeywordInstruction(UnaryOperator):
+    def __init__(self, name: str, bloc: Bloc):
+        super().__init__(None)
+        self.name = name
+        self.bloc = bloc
+
+class UnaryInstruction(Instruction):
 
     def __init__(self, name: str, operand: Operand, bloc: Bloc):
-        super().__init__(name, operand)
-        self.bloc = bloc
+        super().__init__(name, bloc)
+        self.operand = operand
 
     def python(self):
         s = f"{self.name} {self.operand.python()}:\n"
@@ -227,37 +243,38 @@ class KeywordInstruction(UnaryOperator):
         return remove_empty_lines(s)
 
 
-class KeywordBinaryInstruction(BinaryOperator):
+class BinaryInstruction(Instruction):
 
     def __init__(self, name: str, left: Operand, right: Operand, bloc: Bloc):
-        super().__init__(name, left, right)
-        self.bloc = bloc
+        super().__init__(name, bloc)
+        self.left = left
+        self.right = right
 
 
-class IfInstruction(KeywordInstruction):
+class IfInstruction(UnaryInstruction):
 
     def __init__(self, condition: Operand, bloc: Bloc):
         super().__init__("if", condition, bloc)
 
 
-class ElIfInstruction(KeywordInstruction):
+class ElIfInstruction(UnaryInstruction):
 
     def __init__(self, condition: Operand, bloc: Bloc):
         super().__init__("elif", condition, bloc)
 
 
-class ElseInstruction(KeywordInstruction):
+class ElseInstruction(UnaryInstruction):
 
     def __init__(self, bloc: Bloc):
         super().__init__("else", Operand(True), bloc)
 
 
-class WhileInstruction(KeywordInstruction):
+class WhileInstruction(UnaryInstruction):
 
     def __init__(self, condition: Operand, bloc: Bloc):
         super().__init__("while", condition, bloc)
 
-class ForInstruction(KeywordBinaryInstruction):
+class ForInstruction(BinaryInstruction):
 
     def __init__(self, left: Operand, right: Operand, bloc: Bloc):
         super().__init__("for", left, right, bloc)
@@ -268,7 +285,7 @@ class ForInstruction(KeywordBinaryInstruction):
         return remove_empty_lines(s)
 
 
-class Def(KeywordInstruction):
+class FunctionInstruction(UnaryInstruction):
 
     def __init__(self, name: str, parameters: List[str], bloc: Bloc):
         super().__init__(name, Operand(None), bloc)
@@ -278,12 +295,11 @@ class Def(KeywordInstruction):
         s = f"def {self.name}("
         s += ", ".join(self.parameters)
         s += "):\n"
-        for o in self.bloc.operands:
-            s += f"\t{o.python().replace("\n\t", "\n\t\t")}\n"
+        s += self.bloc.python()
         return remove_empty_lines(s)
 
 
-class Lambda(KeywordInstruction):
+class LambdaInstruction(UnaryInstruction):
 
     def __init__(self, parameters: List[str], operand: Operand):
         super().__init__("lambda", operand, Bloc())
@@ -305,6 +321,45 @@ class Call(ManyOperator):
         s +=")"
         return s
 
+class MethodInstruction(FunctionInstruction):
+
+    def __init__(self, name: str, parameters: List[str], bloc: Bloc):
+        super().__init__(name, parameters, bloc)
+
+    def python(self) -> str:
+        s = f"\tdef {self.name}(self, "
+        s += ", ".join(self.parameters)
+        s += "):\n"
+        s += self.bloc.python()
+        return remove_empty_lines(s)
+
+class ClassInstruction(Instruction):
+
+    def __init__(self, name: str, attributes: List[str], methods: List[MethodInstruction], statics: Dict[str, Operand]={}, bloc: Bloc=Bloc([])):
+        super().__init__(name, bloc)
+        self.attributes = attributes
+        self.methods = methods
+        self.statics = statics
+
+    def python(self):
+        s = f"class {self.name}:\n"
+        for static in self.statics:
+            s += f"\t{self.name}.{static}={self.statics[static]}\n"
+        s += "\tdef __init__(self"
+        for attribute in self.attributes:
+            s += f", {attribute}"
+        s += "):\n"
+        for attribute in self.attributes:
+            s += f"\t\tself.{attribute} = {attribute}\n"
+        s += self.bloc.python()
+        s += "\n"
+        for method in self.methods:
+            s += f"{method.python()}\n"
+        return s
+class InstanciationInstruction(Call):
+
+    def __init__(self, name: str, values: List[Operand]):
+        super().__init__(name, values)
 
 if __name__ == '__main__':
     left = Operand("i.value")
@@ -314,9 +369,9 @@ if __name__ == '__main__':
     print(op_equal)
     print(op_equal.python())
     params = ["i", "o", "v"]
-    instruction = Operand("RuleStatus.SUCCESS")
-    print(jsonpickle.dumps(Bloc([instruction]), make_refs=False))
-    lambda_cond = Lambda(params, instruction)
+    success = Operand("RuleStatus.SUCCESS")
+    print(jsonpickle.dumps(Bloc([success]), make_refs=False))
+    lambda_cond = LambdaInstruction(params, success)
     print(lambda_cond)
     print(lambda_cond.python())
     op_less = LTOperator(left, right)
@@ -327,15 +382,16 @@ if __name__ == '__main__':
     affect1 = AffectationOperator(next, div2)
     print(affect1.python())
     if_inst = IfInstruction(EqOperator(right, next),
-                            Bloc([AffectationOperator(next, SubOperator(next, Operand(1)))]))
+                            Bloc([AffectationOperator(next, SubOperator(next, Operand(1)))], indent=1))
     print(if_inst.python())
+    if_inst.bloc.indent+=3
     while_inst = WhileInstruction(
             AndOperator(EqOperator(right, next), NEOperator(right, left)),
             Bloc([if_inst,
-                  ElIfInstruction(op_equal, Bloc([AffectationOperator(next, AddOperator(next, Operand(1)))])),
-                  ElseInstruction(Bloc([AffectationOperator(next, MulOperator(next, Operand(2)))])),
-                  AffectationOperator(next, SubOperator(next, Call("math.sin", [Operand(0)])))]))
-    for_inst = ForInstruction(Operand("i"), RangeOperator(Operand(0), Operand(10), Operand(1)), Bloc([while_inst]))
+                  ElIfInstruction(op_equal, Bloc([AffectationOperator(next, AddOperator(next, Operand(1)))], indent=5)),
+                  ElseInstruction(Bloc([AffectationOperator(next, MulOperator(next, Operand(2)))], indent=4)),
+                  AffectationOperator(next, SubOperator(next, Call("math.sin", [Operand(0)])))], indent=4))
+    for_inst = ForInstruction(Operand("i"), RangeOperator(Operand(0), Operand(10), Operand(1)), Bloc([while_inst], indent=3))
     bloc = Bloc()
     bloc.operands.append(affect1)
     bloc.operands.append(for_inst)
@@ -343,9 +399,10 @@ if __name__ == '__main__':
     bloc.operands.append(AffectationOperator(right, next))
     bloc.operands.append(AffectationOperator(Operand("o.nb_try"), AddOperator(Operand("o.nb_try"), Operand("1"))))
     bloc.operands.append(ReturnOperator(Operand(True)))
-    fn = Def("action_less", params, bloc)
-    print(jsonpickle.dumps(fn, make_refs=False))
-    print(fn.python())
+    fn = MethodInstruction("action_less", params, bloc)
+    class_ = ClassInstruction("RuleSet1", ["toto"], [fn])
+    print(jsonpickle.dumps(class_, make_refs=False))
+    print(class_.python())
     i = Entity()
     i.__dict__ = {"min": 0, "max": 100, "value": 33}
     entity = Entity()

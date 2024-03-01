@@ -45,12 +45,12 @@ class Compilator:
         bloc: Bloc = jsonpickle.loads(json)
         if type(bloc.operands[-1]) is not ReturnOperator:
             bloc.operands[0] = ReturnOperator(bloc.operands[0])
-        fn = Def(name, self.parameters, bloc)
+        fn = FunctionInstruction(name, self.parameters, bloc)
         return fn.python()
 
     def compile_lambda_json(self, json: str):
         bloc = jsonpickle.loads(json)
-        fn = Lambda(self.parameters, bloc)
+        fn = LambdaInstruction(self.parameters, bloc)
         return fn.python()
 
 
